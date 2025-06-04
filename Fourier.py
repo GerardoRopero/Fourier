@@ -7,16 +7,15 @@ from memory_profiler import memory_usage
 T = 2 * np.pi
 M = 1000
 t = np.linspace(0, T, M)
-f = lambda t: np.sin(t) + 0.5 * np.sin(3 * t)
+f = np.sign(np.sin(t))
 
-# Método iterativo
 def calcular_serie_fourier_iterativa(f, t, T, N):
-    a0 = (2 / T) * np.trapezoid(f(t), t)
+    a0 = (2 / T) * np.trapezoid(f, t)
     an = []
     bn = []
     for n in range(1, N + 1):
-        an_n = (2 / T) * np.trapezoid(f(t) * np.cos(2 * np.pi * n * t / T), t)
-        bn_n = (2 / T) * np.trapezoid(f(t) * np.sin(2 * np.pi * n * t / T), t)
+        an_n = (2 / T) * np.trapezoid(f * np.cos(2 * np.pi * n * t / T), t)
+        bn_n = (2 / T) * np.trapezoid(f * np.sin(2 * np.pi * n * t / T), t)
         an.append(an_n)
         bn.append(bn_n)
     return a0 / 2, an, bn
@@ -26,12 +25,11 @@ def calcular_serie_fourier_recursiva(f, t, T, N, n=1, an=None, bn=None):
     if an is None: an = []
     if bn is None: bn = []
     if n > N:
-        a0 = (2 / T) * np.trapezoid(f(t), t)
+        a0 = (2 / T) * np.trapezoid(f, t)
         return a0 / 2, an, bn
-    an_n = (2 / T) * np.trapezoid(f(t) * np.cos(2 * np.pi * n * t / T), t)
-    bn_n = (2 / T) * np.trapezoid(f(t) * np.sin(2 * np.pi * n * t / T), t)
+    an_n = (2 / T) * np.trapezoid(f * np.cos(2 * np.pi * n * t / T), t)
+    bn_n = (2 / T) * np.trapezoid(f * np.sin(2 * np.pi * n * t / T), t)
     return calcular_serie_fourier_recursiva(f, t, T, N, n + 1, an + [an_n], bn + [bn_n])
-
 if __name__ == '__main__':
     Ns = [100, 200, 300, 400, 500]
     tiempos_iter = []
